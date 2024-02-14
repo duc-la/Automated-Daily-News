@@ -1,14 +1,10 @@
-#import os
 import requests
 from bs4 import BeautifulSoup
 import json
-import re
-import csv
+import time
 
 
 
-#TODO:
-# Store information in txt file
 class SummarizedNews:
     def __init__(self):
         """
@@ -21,7 +17,8 @@ class SummarizedNews:
         """
         This function scrapes the CNBC website for the top specified number of news stories and gets the list of links to summarize.
 
-        It adds to the newsLinks attribute.
+        Parameters:
+            numArticles: Number of articles you want to get links from.
         """
         link = "https://www.cnbc.com"
         html = requests.get(link)
@@ -39,7 +36,13 @@ class SummarizedNews:
 
     def summarizeText(self, text):
         """
+        Returns the summary of a passed in article.
 
+        Parameters:
+            text: A string that you want to be summarized, preferably an article.
+
+        Returns:
+            The AI result in a string.
         """
         headers = {
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDAzZDdkNmYtNmEzYy00YzZjLWI1NWMtOTU4MWM5MmFkZmI5IiwidHlwZSI6ImFwaV90b2tlbiJ9.cVgfXIwX5QZklAj1xoPSz4wCP1GfjRFutUeguyS-mQc"}
@@ -56,12 +59,14 @@ class SummarizedNews:
 
         result = json.loads(response.text)
 
-
-        print(result['openai']['result'])
+        return result['openai']['result']
 
     def scrapeArticleTexts(self, numArticles):
         """
         Gathers the text of each article link.
+
+        Parameters:
+            numArticles: Number of articles you want to get text from.
         """
         for i in range(0, numArticles):
             html = requests.get(self.articleLinks[i])
@@ -82,14 +87,28 @@ class SummarizedNews:
 
             self.articleTexts.append(articleText)
 
+    def storeSummaries(self):
+        """
+        Writes all article summaries to a text file.
+        """
+        f = open("summaries.txt", "w+")
+        f.close()
+
+        for i in range(0, len(self.articleTexts)):
+            f = open("summaries.txt", "a")
+            f.write("Link: ")
+            f.write(self.articleLinks[i])
+            f.write("\nSummary: \n")
+            f.write(self.summarizeText(self.articleTexts[i]).replace(". ", ".\n"))
+
+            time.sleep(3)
+            f.write("\n\n\n")
+
+            f.close()
 
 
 
 news = SummarizedNews()
-news.scrapeArticleLinks(10)
-news.scrapeArticleTexts(10)
-for i in range(0, 10):
-    news.summarizeText(news.articleTexts[i])
-    print("\n")
-    print(news.articleTexts[i])
-
+news.scrapeArticleLinks(5)
+news.scrapeArticleTexts(5)
+news.storeSummaries()
