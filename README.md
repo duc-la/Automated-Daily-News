@@ -5,3 +5,5 @@ Overview of newsScraper functionality:
 2. summarizeText() - Summarizes a string of text using OpenAI API
 3. scrapeArticleTexts() - Scrapes each individual news article for big string of raw story
 4. storeSummaries() - Stores the links and summaries in a txt file
+
+summaries.txt shows example program output, displaying the summaries of each requested article.
